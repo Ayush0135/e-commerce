@@ -1,0 +1,175 @@
+/* Fonts loaded via next/font in layout.tsx */
+
+:root {
+  /* 
+   * REFINED ROYAL PALETTE
+   * Deepened shades for professional contrast and legibility 
+   */
+  --royal-burgundy: #5D0E0E;
+  /* Deeper, more blood-red burgundy */
+  --royal-burgundy-dark: #3B0404;
+  /* Near black burgundy for hover/active */
+
+  --royal-gold: #9F7928;
+  /* Darker, antique gold for better text legibility */
+  --royal-gold-light: #D4AF37;
+  /* Brighter gold for borders/accents only */
+
+  --ivory: #FFFCF7;
+  /* Very subtle warm white, less yellow */
+  --cream: #F4F1EA;
+  /* Subtle beige for section banding */
+  --white: #FFFFFF;
+
+  --text-main: #1C1917;
+  /* Sharp detailed black/charcoal */
+  --text-muted: #57534E;
+  /* Professional warm grey */
+  --text-light: #78716C;
+
+  /* Semantic Mappings */
+  --primary: var(--royal-burgundy);
+  --accent: var(--royal-gold);
+  --bg-main: var(--ivory);
+  --bg-alt: var(--cream);
+
+  /* Spacing & Radius */
+  --radius-sm: 2px;
+  /* Sharper corners for heritage feel */
+  --radius-md: 4px;
+  --radius-lg: 8px;
+
+  /* Fonts */
+  --font-royal: 'Cinzel', serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Outfit', sans-serif;
+
+  /* Shadows - softer and more diffuse */
+  --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 10px 40px rgba(93, 14, 14, 0.04);
+  --shadow-gold: 0 0 15px rgba(159, 121, 40, 0.15);
+
+  --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.7;
+}
+
+h1,
+h2,
+h3,
+h4,
+.serif-text {
+  font-family: var(--font-royal);
+  color: var(--primary);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* 
+ * PROFESSIONAL BUTTON SYSTEM 
+ */
+.btn-primary,
+.btn-royal {
+  background: var(--primary);
+  color: white;
+  padding: 1rem 2.8rem;
+  border: 1px solid var(--primary);
+  font-family: var(--font-royal);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+}
+
+.btn-primary:hover,
+.btn-royal:hover {
+  background: var(--royal-burgundy-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(93, 14, 14, 0.2);
+}
+
+.btn-outline,
+.btn-outline-gold {
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--text-main);
+  padding: 1rem 2.8rem;
+  font-family: var(--font-royal);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn-outline-gold {
+  color: var(--royal-gold);
+  border-color: var(--royal-gold);
+}
+
+.btn-outline:hover {
+  background: var(--text-main);
+  color: white;
+}
+
+.btn-outline-gold:hover {
+  background: var(--royal-gold);
+  color: white;
+}
+
+/* Layout Utilities */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 4rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 2rem;
+  }
+}
+
+.section-padding {
+  padding: 10rem 0;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gold-text {
+  color: var(--royal-gold);
+}
+
+.burgundy-text {
+  color: var(--royal-burgundy);
+}

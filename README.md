@@ -1,36 +1,157 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VIRASAT - Heritage Luxury E-Commerce
 
-## Getting Started
+**Virasat** is a premium e-commerce platform dedicated to preserving and selling masterwork Indian heritage artifacts (Sarees, Jewelry, and Hand-crafted apparel). It is built with a focus on "Royal Indian Minimalist" aesthetics, featuring a custom design system, seamless animations, and a secure checkout flow.
 
-First, run the development server:
+![Virasat Preview](https://via.placeholder.com/1200x600?text=VIRASAT+Heritage+Luxury)
 
+## 🚀 Technology Stack
+
+*   **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+*   **Styling**: Vanilla CSS with a Custom "Royal Heritage" Design System (Variables tailored for Deep Burgundy & Antique Gold).
+*   **Authentication**: [Clerk](https://clerk.com/)
+*   **Database**: [Supabase](https://supabase.com/) (PostgreSQL)
+*   **Payments**: [Razorpay](https://razorpay.com/)
+*   **Animations**: [Framer Motion](https://www.framer.com/motion/)
+*   **Icons**: [Lucide React](https://lucide.dev/)
+
+---
+
+## 🛠️ Step-by-Step Setup Guide
+
+Follow these instructions to set up the project locally.
+
+### 1. Prerequisite
+Ensure you have **Node.js 18+** installed.
+
+### 2. Clone the Repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Ayush0135/e-commerce.git
+cd ecommerce-web
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Install Dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Configure Environment Variables
+Create a file named `.env.local` in the root directory. This is critical for the app to function. 
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Copy and paste the following template into `.env.local`:**
 
-## Learn More
+```env
+# ---------------------------------------------------
+# CLERK AUTHENTICATION
+# Obtain keys from: https://dashboard.clerk.com
+# ---------------------------------------------------
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
 
-To learn more about Next.js, take a look at the following resources:
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# ---------------------------------------------------
+# SUPABASE DATABASE
+# Obtain keys from: https://supabase.com/dashboard
+# ---------------------------------------------------
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbG...
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# ---------------------------------------------------
+# RAZORPAY PAYMENTS
+# Obtain keys from: https://dashboard.razorpay.com
+# ---------------------------------------------------
+NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_...
+RAZORPAY_KEY_SECRET=...
+```
 
-## Deploy on Vercel
+### 5. Database Setup (Supabase)
+Run the following SQL in your Supabase SQL Editor to create the products table:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```sql
+create table products (
+  id uuid default uuid_generate_v4() primary key,
+  name text not null,
+  description text,
+  price numeric not null,
+  category text,
+  image_url text, -- primary image
+  images text[], -- additional images array
+  stock integer default 0,
+  is_exclusive boolean default false,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+-- Turn on Row Level Security (Optional for dev, recommended for prod)
+alter table products enable row level security;
+create policy "Public Read Access" on products for select using (true);
+```
+
+### 6. Run the Application
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+---
+
+## 🎨 Design System: "Royal Indian Minimalist"
+
+The UI is built on a strict set of CSS variables defined in `src/app/globals.css`.
+
+*   **Primary Color**: `var(--royal-burgundy)` (`#721818`) - Used for primary actions, headers, and brand identity.
+*   **Accent Color**: `var(--royal-gold)` (`#C5A059`) - Used for borders, highlights, and secondary text.
+*   **Background**: `var(--ivory)` (`#FFFCF2`) - A warm off-white that replaces clinical white for a heritage feel.
+*   **Typography**: 
+    *   *Headings*: **Cinzel** (Google Fonts) - A typeface inspired by first-century Roman inscriptions.
+    *   *Body*: **Outfit** (Google Fonts) - Clean, modern, high-legibility.
+
+---
+
+## 📁 Project Structure
+
+```
+├── src/
+│   ├── app/
+│   │   ├── admin/          # Admin Dashboard (Protected)
+│   │   ├── api/            # Backend API Routes (Checkout, etc.)
+│   │   ├── cart/           # Shopping Cart
+│   │   ├── checkout/       # Checkout Flow (Shipping -> Payment)
+│   │   ├── products/       # Product Listing & Details
+│   │   ├── tracking/       # Order Tracking Page
+│   │   ├── globals.css     # Global Design System
+│   │   ├── layout.tsx      # Root Layout (Fonts, Providers)
+│   │   └── page.tsx        # Home Page (Landing)
+│   ├── components/
+│   │   └── shared/         # Reusable Components (Navbar, Footer)
+│   └── lib/
+│       ├── supabase.ts     # Database Client
+│       └── types.ts        # TypeScript Interfaces
+├── middleware.ts           # Clerk Auth Middleware
+├── .env.local              # Environment Secrets (GitIgnored)
+└── package.json
+```
+
+## 💳 Payment Flow
+1.  **Cart**: User reviews items.
+2.  **Checkout**: 
+    *   Step 1: Shipping Details.
+    *   Step 2: Choose Payment (Card vs COD).
+    *   Step 3: Final Review.
+3.  **Processing**: 
+    *   If Card: Frontend calls `/api/checkout` -> Receive OrderID -> Open Razorpay Modal.
+    *   If COD: Instant confirmation.
+4.  **Success**: Redirect to success view.
+
+## 🤝 Contributing
+1.  Fork the repo.
+2.  Create your feature branch (`git checkout -b feature/amazing-feature`).
+3.  Commit your changes (`git commit -m 'Add some amazing feature'`).
+4.  Push to the branch (`git push origin feature/amazing-feature`).
+5.  Open a Pull Request.
+
+---
+© 2026 Virasat International.

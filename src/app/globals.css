@@ -1,175 +1,138 @@
-/* Fonts loaded via next/font in layout.tsx */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   /* 
-   * REFINED ROYAL PALETTE
-   * Deepened shades for professional contrast and legibility 
+   * POSHAQ PROFESSIONAL PALETTE
+   * Sophisticated Neutrals & Deep Accents
    */
-  --royal-burgundy: #5D0E0E;
-  /* Deeper, more blood-red burgundy */
-  --royal-burgundy-dark: #3B0404;
-  /* Near black burgundy for hover/active */
+  --background: #FAFAF9;
+  /* Stone / Warm White */
+  --foreground: #1C1917;
+  /* Warm Black */
 
-  --royal-gold: #9F7928;
-  /* Darker, antique gold for better text legibility */
-  --royal-gold-light: #D4AF37;
-  /* Brighter gold for borders/accents only */
+  --primary: #292524;
+  /* Stone 800 - Deep Charcoal */
+  --primary-foreground: #FAFAF9;
 
-  --ivory: #FFFCF7;
-  /* Very subtle warm white, less yellow */
-  --cream: #F4F1EA;
-  /* Subtle beige for section banding */
-  --white: #FFFFFF;
+  --secondary: #E7E5E4;
+  /* Stone 200 - Warm Gray */
+  --secondary-foreground: #1C1917;
 
-  --text-main: #1C1917;
-  /* Sharp detailed black/charcoal */
-  --text-muted: #57534E;
-  /* Professional warm grey */
-  --text-light: #78716C;
+  --accent: #57534E;
+  /* Stone 600 - Muted Taupe */
+  --accent-foreground: #FAFAF9;
 
-  /* Semantic Mappings */
-  --primary: var(--royal-burgundy);
-  --accent: var(--royal-gold);
-  --bg-main: var(--ivory);
-  --bg-alt: var(--cream);
+  --brand-gold: #B08D55;
+  /* Muted Professional Gold */
 
-  /* Spacing & Radius */
-  --radius-sm: 2px;
-  /* Sharper corners for heritage feel */
-  --radius-md: 4px;
-  --radius-lg: 8px;
+  --border: #E5E5E5;
+  --input: #E5E5E5;
+  --ring: #292524;
 
   /* Fonts */
-  --font-royal: 'Cinzel', serif;
-  --font-serif: 'Playfair Display', serif;
-  --font-sans: 'Outfit', sans-serif;
+  --font-heading: var(--font-heading), serif;
+  --font-body: var(--font-body), sans-serif;
+  --font-accent: var(--font-accent), serif;
 
-  /* Shadows - softer and more diffuse */
-  --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.03);
-  --shadow-card: 0 10px 40px rgba(93, 14, 14, 0.04);
-  --shadow-gold: 0 0 15px rgba(159, 121, 40, 0.15);
+  --container-width: 1400px;
+}
 
-  --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1400px;
+  }
+}
+
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  border-color: var(--border);
 }
 
 body {
-  background-color: var(--bg-main);
-  color: var(--text-main);
-  font-family: var(--font-sans);
+  background-color: var(--background);
+  background-image:
+    linear-gradient(to bottom, rgba(250, 250, 249, 0.92), rgba(250, 250, 249, 0.85)),
+    url('/images/texture-paper.png');
+  /* Subtle Handmade Paper Texture */
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  color: var(--foreground);
+  font-family: var(--font-body);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  line-height: 1.7;
 }
 
+/* Typography */
 h1,
 h2,
 h3,
 h4,
-.serif-text {
-  font-family: var(--font-royal);
+h5,
+h6 {
+  font-family: var(--font-heading);
   color: var(--primary);
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.2;
 }
 
-/* 
- * PROFESSIONAL BUTTON SYSTEM 
- */
-.btn-primary,
-.btn-royal {
-  background: var(--primary);
-  color: white;
-  padding: 1rem 2.8rem;
+h1 {
+  letter-spacing: -0.02em;
+}
+
+h6 {
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 2.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   border: 1px solid var(--primary);
-  font-family: var(--font-royal);
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  font-weight: 700;
-  cursor: pointer;
-  transition: var(--transition);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  border-radius: var(--radius-sm);
-  text-decoration: none;
 }
 
-.btn-primary:hover,
-.btn-royal:hover {
-  background: var(--royal-burgundy-dark);
-  transform: translateY(-1px);
-  box-shadow: 0 5px 15px rgba(93, 14, 14, 0.2);
+.btn-primary:hover {
+  background-color: transparent;
+  color: var(--primary);
 }
 
-.btn-outline,
-.btn-outline-gold {
-  background: transparent;
-  color: var(--text-main);
-  border: 1px solid var(--text-main);
-  padding: 1rem 2.8rem;
-  font-family: var(--font-royal);
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  font-weight: 700;
-  cursor: pointer;
-  transition: var(--transition);
-  border-radius: var(--radius-sm);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-}
-
-.btn-outline-gold {
-  color: var(--royal-gold);
-  border-color: var(--royal-gold);
+.btn-outline {
+  background-color: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
 }
 
 .btn-outline:hover {
-  background: var(--text-main);
+  background-color: var(--primary);
   color: white;
-}
-
-.btn-outline-gold:hover {
-  background: var(--royal-gold);
-  color: white;
-}
-
-/* Layout Utilities */
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 4rem;
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 0 2rem;
-  }
-}
-
-.section-padding {
-  padding: 10rem 0;
-}
-
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.gold-text {
-  color: var(--royal-gold);
-}
-
-.burgundy-text {
-  color: var(--royal-burgundy);
 }

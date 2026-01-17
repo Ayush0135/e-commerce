@@ -1,39 +1,24 @@
 "use client";
 
-import Navbar from "@/components/shared/Navbar";
-import Footer from "@/components/shared/Footer";
-import { mockProducts } from "@/lib/supabase";
+
 import { Trash2, Minus, Plus, ArrowRight, ShoppingBag } from "lucide-react";
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
     const router = useRouter();
-    const [items, setItems] = useState([
-        { ...mockProducts[0], quantity: 1 },
-        { ...mockProducts[1], quantity: 2 },
-    ]);
+    const { items, updateQuantity, removeItem, total } = useCart();
 
-    const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const subtotal = total;
     const shipping = subtotal > 10000 ? 0 : 500;
     const tax = subtotal * 0.12;
-    const total = subtotal + shipping + tax;
-
-    const updateQuantity = (id: string, delta: number) => {
-        setItems(items.map(item => item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item));
-    };
-
-    const removeItem = (id: string) => {
-        setItems(items.filter(item => item.id !== id));
-    };
+    const finalTotal = subtotal + shipping + tax;
 
     return (
         <main className="cart-page">
-            <Navbar />
-
             <div className="container content-wrapper">
-                <h1 className="page-title serif-text">My Collection</h1>
+                <h1 className="page-title serif-text">Shopping Bag</h1>
 
                 {items.length > 0 ? (
                     <div className="cart-grid">
@@ -49,7 +34,9 @@ export default function CartPage() {
                                         className="cart-item"
                                     >
                                         <div className="item-media">
-                                            <img src={item.images[0]} alt={item.name} />
+                                            <div className="w-full h-full bg-gray-100 flex items-center justify-center relative overflow-hidden">
+                                                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                            </div>
                                         </div>
                                         <div className="item-details">
                                             <div className="details-left">
@@ -58,14 +45,14 @@ export default function CartPage() {
                                                     <h3 className="item-name">{item.name}</h3>
                                                 </div>
                                                 <div className="qty-control">
-                                                    <button onClick={() => updateQuantity(item.id, -1)}><Minus size={14} /></button>
+                                                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)}><Minus size={14} /></button>
                                                     <span>{item.quantity}</span>
-                                                    <button onClick={() => updateQuantity(item.id, 1)}><Plus size={14} /></button>
+                                                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)}><Plus size={14} /></button>
                                                 </div>
                                             </div>
                                             <div className="details-right">
                                                 <p className="item-total">₹ {(item.price * item.quantity).toLocaleString()}</p>
-                                                <button onClick={() => removeItem(item.id)} className="remove-btn"><Trash2 size={18} /></button>
+                                                <button onClick={() => removeItem(item.id)} className="remove-btn"><Trash2 size={16} /></button>
                                             </div>
                                         </div>
                                     </motion.div>
@@ -75,82 +62,71 @@ export default function CartPage() {
 
                         <aside className="summary-column">
                             <div className="summary-card">
-                                <h2 className="summary-title serif-text">Order Review</h2>
+                                <h2 className="summary-title serif-text">Summary</h2>
                                 <div className="summary-rows">
-                                    <div className="row"><span>Heritage Value</span><span>₹ {subtotal.toLocaleString()}</span></div>
-                                    <div className="row"><span>Handling & Secure Ship</span><span>{shipping === 0 ? "Complimentary" : `₹ ${shipping}`}</span></div>
-                                    <div className="row"><span>Tax (GST 12%)</span><span>₹ {tax.toLocaleString()}</span></div>
-                                    <div className="total-row"><span>Final Value</span><span>₹ {total.toLocaleString()}</span></div>
+                                    <div className="row"><span>Subtotal</span><span>₹ {subtotal.toLocaleString()}</span></div>
+                                    <div className="row"><span>Shipping</span><span>{shipping === 0 ? "Free" : `₹ ${shipping}`}</span></div>
+                                    <div className="row"><span>Tax</span><span>₹ {tax.toLocaleString()}</span></div>
+                                    <div className="total-row"><span>Total</span><span>₹ {finalTotal.toLocaleString()}</span></div>
                                 </div>
 
-                                <button onClick={() => router.push('/checkout')} className="btn-royal checkout-btn">
-                                    Curate My Order <ArrowRight size={18} />
+                                <button onClick={() => router.push('/checkout')} className="btn-black checkout-btn">
+                                    Proceed to Checkout <ArrowRight size={16} />
                                 </button>
-
-                                <div className="heritage-note">
-                                    <p className="note-label">Legacy Guarantee</p>
-                                    <p className="note-text">Each piece in your collection is hand-verified for authenticity before shipment.</p>
-                                </div>
                             </div>
                         </aside>
                     </div>
                 ) : (
                     <div className="empty-cart">
-                        <ShoppingBag size={80} strokeWidth={1} style={{ opacity: 0.2, color: 'var(--royal-burgundy)' }} />
-                        <h2 className="serif-text">Your collection is empty.</h2>
-                        <p>Start your heritage journey today.</p>
-                        <button onClick={() => router.push('/products')} className="btn-royal">Browse Collection</button>
+                        <ShoppingBag size={60} strokeWidth={1} style={{ opacity: 0.2, color: 'black' }} />
+                        <h2 className="serif-text">Your bag is empty.</h2>
+                        <button onClick={() => router.push('/shop')} className="btn-black mt-6">Continue Shopping</button>
                     </div>
                 )}
             </div>
 
-            <Footer />
+
 
             <style jsx>{`
-        .cart-page { background: var(--ivory); min-height: 100vh; }
-        .content-wrapper { padding-top: 10rem; padding-bottom: 5rem; }
-        .page-title { font-size: 3rem; color: var(--royal-burgundy); margin-bottom: 3rem; border-bottom: 1px solid rgba(114, 24, 24, 0.1); padding-bottom: 2rem; }
+        .cart-page { background: white; min-height: 100vh; }
+        .content-wrapper { padding-top: 8rem; padding-bottom: 5rem; }
+        .page-title { font-size: 3rem; color: black; margin-bottom: 3rem; font-family: var(--font-heading); }
 
         .cart-grid { display: grid; grid-template-columns: 1.8fr 1fr; gap: 4rem; align-items: flex-start; }
         
-        .items-column { display: flex; flex-direction: column; gap: 1.5rem; }
-        .cart-item { background: white; padding: 1.5rem; border-radius: 4px; display: flex; gap: 2rem; border: 1px solid rgba(197, 160, 89, 0.2); box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        .items-column { display: flex; flex-direction: column; }
+        .cart-item { background: white; padding: 2rem 0; border-bottom: 1px solid #f3f4f6; display: flex; gap: 2rem; }
         
-        .item-media { width: 120px; aspect-ratio: 1; border-radius: 2px; overflow: hidden; background: var(--cream); }
-        .item-media img { width: 100%; height: 100%; object-fit: cover; }
+        .item-media { width: 100px; aspect-ratio: 0.8; background: #f9fafb; }
         
         .item-details { flex: 1; display: flex; justify-content: space-between; }
         .details-left { display: flex; flex-direction: column; justify-content: space-between; }
-        .item-cat { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--royal-gold); font-weight: 800; font-family: var(--font-sans); }
-        .item-name { font-family: var(--font-royal); font-size: 1.25rem; color: var(--text-main); margin-top: 0.25rem; }
+        .item-cat { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280; margin-bottom: 0.5rem; display: block; }
+        .item-name { font-family: var(--font-heading); font-size: 1.1rem; color: black; font-weight: 500; }
         
-        .qty-control { display: flex; align-items: center; gap: 1.5rem; background: var(--cream); padding: 0.5rem 1rem; border-radius: 4px; width: fit-content; margin-top: 1rem; border: 1px solid rgba(197, 160, 89, 0.2); }
-        .qty-control button { background: none; border: none; cursor: pointer; color: var(--text-main); transition: color 0.2s; display: flex; align-items: center; }
-        .qty-control button:hover { color: var(--royal-burgundy); }
-        .qty-control span { font-weight: bold; width: 20px; text-align: center; font-size: 0.9rem; color: var(--text-main); }
+        .qty-control { display: flex; align-items: center; gap: 1.5rem; border: 1px solid #e5e7eb; padding: 0.25rem 0.75rem; width: fit-content; margin-top: 1rem; }
+        .qty-control button { background: none; border: none; cursor: pointer; color: black; display: flex; align-items: center; }
+        .qty-control span { font-size: 0.9rem; color: black; }
 
         .details-right { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; }
-        .item-total { font-size: 1.25rem; font-weight: 700; color: var(--royal-burgundy); font-family: var(--font-serif); }
+        .item-total { font-size: 1rem; color: black; font-family: var(--font-heading); }
         .remove-btn { background: none; border: none; cursor: pointer; color: #9ca3af; transition: color 0.2s; }
-        .remove-btn:hover { color: #b91c1c; }
+        .remove-btn:hover { color: black; }
 
-        .summary-column { position: sticky; top: 10rem; z-index: 10; }
-        .summary-card { background: white; padding: 2.5rem; border-radius: 4px; box-shadow: var(--shadow-premium); border: 1px solid var(--royal-gold); }
-        .summary-title { font-size: 1.75rem; color: var(--royal-burgundy); margin-bottom: 2rem; font-family: var(--font-royal); }
+        .summary-column { position: sticky; top: 8rem; }
+        .summary-card { background: #f9fafb; padding: 2rem; }
+        .summary-title { font-size: 1.25rem; color: black; margin-bottom: 1.5rem; font-family: var(--font-heading); text-transform: uppercase; letter-spacing: 0.05em; }
         
-        .summary-rows { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 2.5rem; }
-        .row { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-main); opacity: 0.8; }
-        .total-row { display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 700; color: var(--royal-burgundy); border-top: 1px solid var(--cream); padding-top: 1.5rem; margin-top: 0.5rem; font-family: var(--font-serif); }
+        .summary-rows { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+        .row { display: flex; justify-content: space-between; font-size: 0.9rem; color: #4b5563; }
+        .total-row { display: flex; justify-content: space-between; font-size: 1.1rem; color: black; border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 0.5rem; font-family: var(--font-heading); }
         
-        .checkout-btn { width: 100%; border-radius: 2px; display: flex; align-items: center; justify-content: center; gap: 1rem; text-decoration: none; padding: 1rem 2rem; border: none; font-size: 0.9rem; }
-        
-        .heritage-note { margin-top: 2rem; padding: 1.5rem; background: var(--cream); border: 1px solid rgba(197, 160, 89, 0.3); text-align: center; border-radius: 2px; }
-        .note-label { font-size: 0.65rem; text-transform: uppercase; font-weight: 800; color: var(--royal-burgundy); letter-spacing: 0.1em; margin-bottom: 0.5rem; }
-        .note-text { font-size: 0.75rem; color: var(--text-main); line-height: 1.5; opacity: 0.8; }
+        .checkout-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 1rem; text-decoration: none; padding: 1rem; border: none; font-size: 0.9rem; cursor: pointer; }
+        .btn-black { background: black; color: white; text-transform: uppercase; letter-spacing: 0.1em; transition: opacity 0.2s; }
+        .btn-black:hover { opacity: 0.8; }
 
-        .empty-cart { padding: 8rem 0; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; background: white; border-radius: 4px; border: 1px dashed var(--royal-gold); }
-        .empty-cart h2 { color: var(--royal-burgundy); font-size: 2rem; }
-        .empty-cart p { color: var(--text-main); margin-bottom: 1rem; }
+        .empty-cart { padding: 6rem 0; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+        .empty-cart h2 { color: black; font-size: 2rem; font-family: var(--font-heading); }
 
         @media (max-width: 1024px) {
             .cart-grid { grid-template-columns: 1fr; }

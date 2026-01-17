@@ -5,11 +5,13 @@ import { ShoppingBag, User, Menu, X, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/context/CartContext";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isSignedIn } = useUser();
+  const { cartCount } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,7 +41,7 @@ export default function Navbar() {
 
         {/* Center Logo */}
         <Link href="/" className="nav-logo">
-          <span className="logo-text">VIRASAT</span>
+          <span className="logo-text">POSHAQ</span>
           <span className="logo-tag">HERITAGE LUXURY</span>
         </Link>
 
@@ -48,7 +50,7 @@ export default function Navbar() {
           <button className="nav-icon"><Search size={20} strokeWidth={1.5} /></button>
           <Link href="/cart" className="nav-icon relative">
             <ShoppingBag size={20} strokeWidth={1.5} />
-            <div className="cart-badge" />
+            {cartCount > 0 && <div className="cart-badge" />}
           </Link>
           <div className="user-area">
             {isSignedIn ? <UserButton afterSignOutUrl="/" /> : (

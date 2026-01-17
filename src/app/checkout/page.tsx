@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Navbar from "@/components/shared/Navbar";
-import Footer from "@/components/shared/Footer";
 import { CreditCard, ShieldCheck, MapPin, ChevronRight, CheckCircle2, ChevronLeft, Loader2, Lock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -87,36 +85,23 @@ export default function CheckoutPage() {
 
     if (isCompleted) {
         return (
-            <main className="success-page">
-                <div className="container success-container">
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="success-icon">
+            <main className="min-h-screen bg-[#fafaf9] flex items-center justify-center">
+                <div className="max-w-[500px] w-full text-center bg-white p-16 rounded shadow-lg border-t-4 border-[#C5A059]">
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-24 h-24 rounded-full bg-[#fafaf9] text-[#721818] flex items-center justify-center mx-auto mb-8 border border-[#C5A059]">
                         <CheckCircle2 size={48} />
                     </motion.div>
-                    <h1 className="serif-text">Legacy Confirmed</h1>
-                    <p>Thank you for choosing Virasat. Your heritage piece is being carefully prepared by our artisans.</p>
-                    <div className="order-summary-box">
-                        <div className="box-row"><span>Order ID</span><span className="bold">#VR-82910</span></div>
-                        <div className="box-row"><span>Estimated Dispatch</span><span className="bold">48 Hours</span></div>
-                        <div className="box-row"><span>Payment Status</span><span className="bold">{paymentMethod === 'card' ? 'Verified' : 'Pending (COD)'}</span></div>
+                    <h1 className="text-4xl text-[#721818] mb-4 font-serif">Legacy Confirmed</h1>
+                    <p className="text-gray-600 font-light leading-relaxed mb-8 opacity-80">Thank you for choosing Virasat. Your heritage piece is being carefully prepared by our artisans.</p>
+                    <div className="bg-[#fafaf9] p-6 rounded text-left mb-10 border border-[#C5A059]/20">
+                        <div className="flex justify-between text-sm mb-2"><span>Order ID</span><span className="font-bold text-[#721818] font-serif">#VR-82910</span></div>
+                        <div className="flex justify-between text-sm mb-2"><span>Estimated Dispatch</span><span className="font-bold text-[#721818] font-serif">48 Hours</span></div>
+                        <div className="flex justify-between text-sm mb-2"><span>Payment Status</span><span className="font-bold text-[#721818] font-serif">{paymentMethod === 'card' ? 'Verified' : 'Pending (COD)'}</span></div>
                     </div>
-                    <div className="success-actions">
-                        <Link href="/tracking" className="btn-royal text-center no-underline block py-3">Track My Legacy</Link>
-                        <Link href="/" className="back-link">Return to Home</Link>
+                    <div className="flex flex-col gap-4">
+                        <Link href="/tracking" className="w-full py-3 bg-[#1a1a1a] text-white rounded font-semibold hover:bg-[#333] transition-colors text-center no-underline block">Track My Legacy</Link>
+                        <Link href="/" className="text-xs uppercase font-extrabold text-gray-400 tracking-widest hover:text-[#721818] transition-colors">Return to Home</Link>
                     </div>
                 </div>
-                <style jsx>{`
-          .success-page { min-height: 100vh; background: var(--ivory); display: flex; align-items: center; justify-content: center; }
-          .success-container { max-width: 500px; text-align: center; background: white; padding: 4rem; border-radius: 4px; box-shadow: var(--shadow-premium); border-top: 4px solid var(--royal-gold); }
-          .success-icon { width: 96px; height: 96px; border-radius: 50%; background: var(--cream); color: var(--royal-burgundy); display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; border: 1px solid var(--royal-gold); }
-          .success-container h1 { font-size: 2.5rem; color: var(--royal-burgundy); margin-bottom: 1rem; font-family: var(--font-royal); }
-          .success-container p { color: var(--text-main); font-weight: 300; line-height: 1.6; margin-bottom: 2rem; opacity: 0.8; }
-          .order-summary-box { background: var(--cream); padding: 1.5rem; border-radius: 4px; text-align: left; margin-bottom: 2.5rem; border: 1px solid rgba(197, 160, 89, 0.2); }
-          .box-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.5rem; }
-          .bold { font-weight: 700; color: var(--royal-burgundy); font-family: var(--font-royal); }
-          .success-actions { display: flex; flex-direction: column; gap: 1rem; }
-          .back-link { font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); letter-spacing: 0.1em; transition: color 0.2s; text-decoration: none; }
-          .back-link:hover { color: var(--royal-burgundy); }
-        `}</style>
             </main>
         );
     }
@@ -124,200 +109,150 @@ export default function CheckoutPage() {
     return (
         <main className="checkout-page">
             <Script src="https://checkout.razorpay.com/v1/checkout.js" />
-            <Navbar />
-
-            <div className="container content-wrapper">
-                <div className="checkout-layout">
-                    {/* Main Content */}
-                    <div className="form-column">
-                        <header className="checkout-header">
-                            <h1 className="serif-text">Acquisition</h1>
-                            <div className="stepper">
-                                {[1, 2, 3].map(s => (
-                                    <div key={s} className={`step-item ${step >= s ? 'active' : ''}`}>
-                                        <div className="step-circle">{s}</div>
-                                        <span className="step-label">{s === 1 ? 'Shipping' : s === 2 ? 'Payment' : 'Review'}</span>
-                                        {s < 3 && <div className="step-line" />}
-                                    </div>
-                                ))}
-                            </div>
-                        </header>
-
-                        <div className="card-container">
-                            <AnimatePresence mode="wait">
-                                {step === 1 && (
-                                    <motion.form key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} onSubmit={nextStep}>
-                                        <div className="section-title"><MapPin size={20} /> <h2>Shipping Destination</h2></div>
-                                        <div className="input-grid">
-                                            <div className="full"><label>Full Name</label><input required type="text" placeholder="Majestic Name" /></div>
-                                            <div><label>Email Address</label><input required type="email" placeholder="example@heritage.com" /></div>
-                                            <div><label>Contact Number</label><input required type="tel" placeholder="+91 XXXX XXXX" /></div>
-                                            <div className="full"><label>Palatial Address / Street</label><input required type="text" placeholder="Lane No. 12, Civil Town" /></div>
-                                            <div><label>City</label><input required type="text" placeholder="Varanasi" /></div>
-                                            <div><label>Postal Code</label><input required type="text" placeholder="221001" /></div>
-                                        </div>
-                                        <button type="submit" className="btn-royal next-btn">Proceed to Payment <ChevronRight size={18} /></button>
-                                    </motion.form>
-                                )}
-
-                                {step === 2 && (
-                                    <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                                        <div className="section-title"><CreditCard size={20} /> <h2>Select Payment Method</h2></div>
-                                        <div className="payment-options-col">
-                                            <button
-                                                className={`pay-opt ${paymentMethod === 'card' ? 'active' : ''}`}
-                                                onClick={() => setPaymentMethod('card')}
-                                            >
-                                                <div className="opt-left">
-                                                    <div className="radio-circle" />
-                                                    <span className="opt-title">Secure Online Payment</span>
-                                                </div>
-                                                <div className="opt-icons">
-                                                    <span className="text-xs text-muted">Razorpay Secured</span>
-                                                    <Lock size={14} />
-                                                </div>
-                                            </button>
-
-                                            <button
-                                                className={`pay-opt ${paymentMethod === 'cod' ? 'active' : ''}`}
-                                                onClick={() => setPaymentMethod('cod')}
-                                            >
-                                                <div className="opt-left">
-                                                    <div className="radio-circle" />
-                                                    <span className="opt-title">Cash on Delivery</span>
-                                                </div>
-                                                <span className="text-xs text-muted">Pay at doorstep</span>
-                                            </button>
-                                        </div>
-
-                                        <div className="actions flex gap-4 mt-10">
-                                            <button onClick={() => setStep(1)} className="back-btn-ui"><ChevronLeft size={18} /> Back</button>
-                                            <button onClick={() => setStep(3)} className="btn-royal flex-1">Review Order</button>
-                                        </div>
-                                    </motion.div>
-                                )}
-
-                                {step === 3 && (
-                                    <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                                        <div className="section-title"><ShieldCheck size={20} /> <h2>Final Verification</h2></div>
-                                        <div className="verification-box">
-                                            <div className="v-row"><span>Delivery to</span><span>Civil Lines, UP, India</span></div>
-                                            <div className="v-row"><span>Payment method</span><span>{paymentMethod === 'card' ? 'Secure Online Payment' : 'Cash on Delivery'}</span></div>
-                                            <div className="v-row total"><span>Total Amount</span><span>₹ 45,500</span></div>
-                                        </div>
-
-                                        <div className="terms-text">
-                                            By proceeding, you agree to our curation terms and artisan protection policy.
-                                        </div>
-
-                                        <button disabled={isProcessing} onClick={handlePayment} className="btn-royal next-btn">
-                                            {isProcessing ? <Loader2 className="animate-spin" size={20} /> : "Finalize Acquisition"}
-                                        </button>
-                                        <button onClick={() => setStep(2)} className="text-link mt-4 text-center block w-full">Edit Details</button>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+            <div className="checkout-layout grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-16 items-start pt-20 pb-20">
+                {/* Main Content */}
+                <div className="form-column">
+                    <header className="checkout-header mb-12">
+                        <h1 className="serif-text text-5xl text-[#721818] mb-8 font-serif">Acquisition</h1>
+                        <div className="stepper flex items-center gap-4">
+                            {[1, 2, 3].map(s => (
+                                <div key={s} className={`step-item flex items-center gap-2 transition-opacity duration-300 ${step >= s ? 'opacity-100' : 'opacity-50'}`}>
+                                    <div className={`step-circle w-8 h-8 rounded-full border border-[#721818] flex items-center justify-center font-bold ${step >= s ? 'bg-[#721818] text-white' : 'text-[#721818]'}`}>{s}</div>
+                                    <span className="step-label text-xs uppercase tracking-widest font-bold text-[#721818]">{s === 1 ? 'Shipping' : s === 2 ? 'Payment' : 'Review'}</span>
+                                    {s < 3 && <div className="step-line w-10 h-px bg-[#721818] ml-2" />}
+                                </div>
+                            ))}
                         </div>
-                    </div>
+                    </header>
 
-                    {/* Sidebar */}
-                    <aside className="summary-column">
-                        <div className="order-card">
-                            <h3 className="serif-text">Bag Details</h3>
-                            <div className="products-mini">
-                                <div className="mini-item">
-                                    <img src="https://images.unsplash.com/photo-1610030469915-9a08ec996a9a?auto=format&fit=crop&q=80&w=200" alt="" />
-                                    <div className="mini-info">
-                                        <p className="mini-name">Royal Banarasi Silk Saree</p>
-                                        <p className="mini-price">₹ 45,000</p>
+                    <div className="card-container bg-white p-12 rounded border border-[#C5A059]/20 shadow-md">
+                        <AnimatePresence mode="wait">
+                            {step === 1 && (
+                                <motion.form key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} onSubmit={nextStep}>
+                                    <div className="section-title flex items-center gap-4 text-[#C5A059] mb-10 border-b border-gray-100 pb-4">
+                                        <MapPin size={20} />
+                                        <h2 className="font-serif text-xl text-[#721818]">Shipping Destination</h2>
                                     </div>
+                                    <div className="input-grid grid grid-cols-2 gap-6">
+                                        <div className="col-span-2">
+                                            <label className="block text-xs uppercase font-extrabold tracking-widest text-[#C5A059] mb-2">Full Name</label>
+                                            <input required type="text" placeholder="Majestic Name" className="w-full p-4 border border-gray-200 bg-[#fdfdfd] text-gray-700 rounded-sm focus:outline-none focus:border-[#C5A059] focus:bg-white transition-colors" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs uppercase font-extrabold tracking-widest text-[#C5A059] mb-2">Email Address</label>
+                                            <input required type="email" placeholder="example@heritage.com" className="w-full p-4 border border-gray-200 bg-[#fdfdfd] text-gray-700 rounded-sm focus:outline-none focus:border-[#C5A059] focus:bg-white transition-colors" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs uppercase font-extrabold tracking-widest text-[#C5A059] mb-2">Contact Number</label>
+                                            <input required type="tel" placeholder="+91 XXXX XXXX" className="w-full p-4 border border-gray-200 bg-[#fdfdfd] text-gray-700 rounded-sm focus:outline-none focus:border-[#C5A059] focus:bg-white transition-colors" />
+                                        </div>
+                                        <div className="col-span-2">
+                                            <label className="block text-xs uppercase font-extrabold tracking-widest text-[#C5A059] mb-2">Palatial Address / Street</label>
+                                            <input required type="text" placeholder="Lane No. 12, Civil Town" className="w-full p-4 border border-gray-200 bg-[#fdfdfd] text-gray-700 rounded-sm focus:outline-none focus:border-[#C5A059] focus:bg-white transition-colors" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs uppercase font-extrabold tracking-widest text-[#C5A059] mb-2">City</label>
+                                            <input required type="text" placeholder="Varanasi" className="w-full p-4 border border-gray-200 bg-[#fdfdfd] text-gray-700 rounded-sm focus:outline-none focus:border-[#C5A059] focus:bg-white transition-colors" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs uppercase font-extrabold tracking-widest text-[#C5A059] mb-2">Postal Code</label>
+                                            <input required type="text" placeholder="221001" className="w-full p-4 border border-gray-200 bg-[#fdfdfd] text-gray-700 rounded-sm focus:outline-none focus:border-[#C5A059] focus:bg-white transition-colors" />
+                                        </div>
+                                    </div>
+                                    <button type="submit" className="w-full flex items-center justify-center gap-4 mt-8 p-5 bg-[#1a1a1a] text-white rounded font-semibold hover:bg-[#333] transition-colors">Proceed to Payment <ChevronRight size={18} /></button>
+                                </motion.form>
+                            )}
+
+                            {step === 2 && (
+                                <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                                    <div className="section-title flex items-center gap-4 text-[#C5A059] mb-10 border-b border-gray-100 pb-4">
+                                        <CreditCard size={20} />
+                                        <h2 className="font-serif text-xl text-[#721818]">Select Payment Method</h2>
+                                    </div>
+                                    <div className="payment-options-col flex flex-col gap-4">
+                                        <button
+                                            className={`pay-opt flex justify-between items-center p-6 border rounded-sm transition-all ${paymentMethod === 'card' ? 'border-[#C5A059] bg-white shadow-md' : 'border-gray-200 bg-[#fafafa]'}`}
+                                            onClick={() => setPaymentMethod('card')}
+                                        >
+                                            <div className="opt-left flex items-center gap-4">
+                                                <div className={`radio-circle w-4 h-4 border border-[#C5A059] rounded-full relative ${paymentMethod === 'card' ? 'after:absolute after:inset-[3px] after:bg-[#721818] after:rounded-full' : ''}`} />
+                                                <span className="opt-title font-bold text-gray-700">Secure Online Payment</span>
+                                            </div>
+                                            <div className="opt-icons flex items-center gap-2 text-[#721818]">
+                                                <span className="text-xs text-gray-400">Razorpay Secured</span>
+                                                <Lock size={14} />
+                                            </div>
+                                        </button>
+
+                                        <button
+                                            className={`pay-opt flex justify-between items-center p-6 border rounded-sm transition-all ${paymentMethod === 'cod' ? 'border-[#C5A059] bg-white shadow-md' : 'border-gray-200 bg-[#fafafa]'}`}
+                                            onClick={() => setPaymentMethod('cod')}
+                                        >
+                                            <div className="opt-left flex items-center gap-4">
+                                                <div className={`radio-circle w-4 h-4 border border-[#C5A059] rounded-full relative ${paymentMethod === 'cod' ? 'after:absolute after:inset-[3px] after:bg-[#721818] after:rounded-full' : ''}`} />
+                                                <span className="opt-title font-bold text-gray-700">Cash on Delivery</span>
+                                            </div>
+                                            <span className="text-xs text-gray-400">Pay at doorstep</span>
+                                        </button>
+                                    </div>
+
+                                    <div className="actions flex gap-4 mt-10">
+                                        <button onClick={() => setStep(1)} className="flex items-center gap-2 bg-transparent border-none text-gray-500 cursor-pointer uppercase text-xs font-extrabold tracking-widest hover:text-[#721818]"><ChevronLeft size={18} /> Back</button>
+                                        <button onClick={() => setStep(3)} className="flex-1 bg-[#1a1a1a] text-white p-5 rounded font-semibold hover:bg-[#333] transition-colors">Review Order</button>
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {step === 3 && (
+                                <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+                                    <div className="section-title flex items-center gap-4 text-[#C5A059] mb-10 border-b border-gray-100 pb-4">
+                                        <ShieldCheck size={20} />
+                                        <h2 className="font-serif text-xl text-[#721818]">Final Verification</h2>
+                                    </div>
+                                    <div className="verification-box bg-[#fafafa] p-6 border border-[#C5A059]/20 mb-8">
+                                        <div className="v-row flex justify-between py-3 border-b border-dashed border-gray-200 text-sm text-gray-700"><span>Delivery to</span><span>Civil Lines, UP, India</span></div>
+                                        <div className="v-row flex justify-between py-3 border-b border-dashed border-gray-200 text-sm text-gray-700"><span>Payment method</span><span>{paymentMethod === 'card' ? 'Secure Online Payment' : 'Cash on Delivery'}</span></div>
+                                        <div className="v-row total flex justify-between py-3 text-lg font-bold text-[#721818] border-t border-gray-200 mt-2 pt-4"><span>Total Amount</span><span>₹ 45,500</span></div>
+                                    </div>
+
+                                    <div className="terms-text text-xs text-gray-400 text-center mb-4">
+                                        By proceeding, you agree to our curation terms and artisan protection policy.
+                                    </div>
+
+                                    <button disabled={isProcessing} onClick={handlePayment} className="w-full flex items-center justify-center p-5 bg-[#1a1a1a] text-white rounded font-semibold hover:bg-[#333] transition-colors disabled:opacity-70 disabled:cursor-not-allowed">
+                                        {isProcessing ? <Loader2 className="animate-spin" size={20} /> : "Finalize Acquisition"}
+                                    </button>
+                                    <button onClick={() => setStep(2)} className="block w-full text-center mt-4 text-xs text-gray-500 underline hover:text-gray-800">Edit Details</button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </div>
+
+                {/* Sidebar */}
+                <aside className="summary-column">
+                    <div className="order-card bg-white p-8 rounded border border-gray-200 sticky top-40">
+                        <h3 className="font-serif text-xl text-[#721818] mb-6">Bag Details</h3>
+                        <div className="products-mini mb-6">
+                            <div className="mini-item flex gap-4 mb-6">
+                                <img src="https://images.unsplash.com/photo-1610030469915-9a08ec996a9a?auto=format&fit=crop&q=80&w=200" alt="" className="w-16 h-16 object-cover rounded-sm" />
+                                <div className="mini-info">
+                                    <p className="text-sm">Royal Banarasi Silk Saree</p>
+                                    <p className="font-semibold text-gray-700">₹ 45,000</p>
                                 </div>
                             </div>
-                            <div className="total-lines">
-                                <div className="line"><span>Subtotal</span><span>₹ 45,000</span></div>
-                                <div className="line"><span>Shipping</span><span>₹ 500</span></div>
-                                <div className="line total"><span>Total to Pay</span><span>₹ 45,500</span></div>
-                            </div>
-                            <div className="secure-badge">
-                                <Lock size={12} /> SSL Encrypted Checkout
-                            </div>
                         </div>
-                    </aside>
-                </div>
+                        <div className="total-lines border-t border-gray-200 pt-4">
+                            <div className="flex justify-between text-sm mb-2 text-gray-500"><span>Subtotal</span><span>₹ 45,000</span></div>
+                            <div className="flex justify-between text-sm mb-2 text-gray-500"><span>Shipping</span><span>₹ 500</span></div>
+                            <div className="flex justify-between text-lg font-bold text-[#721818] mt-4 font-serif"><span>Total to Pay</span><span>₹ 45,500</span></div>
+                        </div>
+                        <div className="secure-badge mt-8 flex items-center justify-center gap-2 text-[0.65rem] text-[#C5A059] uppercase tracking-widest font-bold">
+                            <Lock size={12} /> SSL Encrypted Checkout
+                        </div>
+                    </div>
+                </aside>
             </div>
-
-            <Footer />
-
-            <style jsx>{`
-        .checkout-page { background: var(--ivory); min-height: 100vh; }
-        .content-wrapper { padding-top: 10rem; padding-bottom: 5rem; }
-
-        .checkout-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 4rem; align-items: start; }
-        
-        .checkout-header { margin-bottom: 3rem; }
-        .checkout-header h1 { font-size: 3rem; color: var(--royal-burgundy); margin-bottom: 2rem; }
-
-        .stepper { display: flex; align-items: center; gap: 1rem; }
-        .step-item { display: flex; align-items: center; gap: 0.5rem; opacity: 0.5; transition: 0.3s; }
-        .step-item.active { opacity: 1; }
-        .step-circle { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--royal-burgundy); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--royal-burgundy); }
-        .step-item.active .step-circle { background: var(--royal-burgundy); color: white; }
-        .step-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; color: var(--royal-burgundy); }
-        .step-line { width: 40px; height: 1px; background: var(--royal-burgundy); margin-left: 0.5rem; }
-
-        .card-container { background: white; padding: 3rem; border-radius: 4px; border: 1px solid rgba(197, 160, 89, 0.2); box-shadow: var(--shadow-premium); }
-        .section-title { display: flex; align-items: center; gap: 1rem; color: var(--royal-gold); margin-bottom: 2.5rem; border-bottom: 1px solid var(--cream); padding-bottom: 1rem; }
-        .section-title h2 { font-family: var(--font-royal); font-size: 1.25rem; color: var(--royal-burgundy); }
-
-        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .full { grid-column: span 2; }
-        label { display: block; font-size: 0.65rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.1em; color: var(--royal-gold); margin-bottom: 0.5rem; }
-        input { width: 100%; padding: 1rem; border: 1px solid var(--cream); background: #fdfdfd; font-family: var(--font-sans); color: var(--text-main); transition: 0.3s; border-radius: 2px; }
-        input:focus { outline: none; border-color: var(--royal-gold); background: white; }
-
-        .next-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 2rem; padding: 1.25rem; border: none; font-size: 0.9rem; }
-        .back-btn-ui { display: flex; align-items: center; gap: 0.5rem; background: none; border: none; color: var(--text-muted); cursor: pointer; text-transform: uppercase; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1em; }
-        .back-btn-ui:hover { color: var(--royal-burgundy); }
-
-        .payment-options-col { display: flex; flex-direction: column; gap: 1rem; }
-        .pay-opt { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border: 1px solid var(--cream); background: var(--ivory); cursor: pointer; border-radius: 2px; transition: all 0.2s; }
-        .pay-opt.active { border-color: var(--royal-gold); background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .opt-left { display: flex; align-items: center; gap: 1rem; }
-        .radio-circle { width: 16px; height: 16px; border: 1px solid var(--royal-gold); border-radius: 50%; position: relative; }
-        .pay-opt.active .radio-circle::after { content: ''; position: absolute; inset: 3px; background: var(--royal-burgundy); border-radius: 50%; }
-        .opt-title { font-family: var(--font-royal); font-weight: 700; color: var(--text-main); }
-        .opt-icons { display: flex; align-items: center; gap: 0.5rem; color: var(--royal-burgundy); }
-
-        .verification-box { background: var(--cream); padding: 1.5rem; border: 1px solid rgba(197, 160, 89, 0.2); margin-bottom: 2rem; }
-        .v-row { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px dashed rgba(0,0,0,0.05); font-size: 0.9rem; color: var(--text-main); }
-        .v-row.total { font-weight: 700; color: var(--royal-burgundy); border-bottom: none; font-size: 1.1rem; border-top: 1px solid rgba(0,0,0,0.05); margin-top: 0.5rem; padding-top: 1rem; }
-        .text-link { background: none; border: none; text-decoration: underline; color: var(--text-muted); cursor: pointer; font-size: 0.75rem; }
-        .terms-text { font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-bottom: 1rem; }
-
-        .order-card { background: white; padding: 2rem; border-radius: 4px; border: 1px solid var(--cream); position: sticky; top: 10rem; }
-        .order-card h3 { font-size: 1.25rem; color: var(--royal-burgundy); margin-bottom: 1.5rem; }
-        .mini-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
-        .mini-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 2px; }
-        .mini-info p { font-size: 0.85rem; }
-        .mini-price { font-weight: 600; color: var(--text-main); }
-
-        .total-lines { border-top: 1px solid var(--cream); padding-top: 1rem; }
-        .line { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-muted); }
-        .line.total { font-size: 1.1rem; font-weight: 700; color: var(--royal-burgundy); margin-top: 1rem; font-family: var(--font-serif); }
-        
-        .secure-badge { margin-top: 2rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.65rem; color: var(--royal-gold); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; }
-
-        .mt-6 { margin-top: 1.5rem; }
-        .mt-10 { margin-top: 2.5rem; }
-        .gap-4 { gap: 1rem; }
-        .flex { display: flex; }
-        .flex-1 { flex: 1; }
-
-        @media (max-width: 1024px) {
-          .checkout-layout { grid-template-columns: 1fr; }
-          .order-card { position: relative; top: 0; }
-        }
-      `}</style>
         </main>
     );
 }

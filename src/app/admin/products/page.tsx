@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Search, Filter, Edit2, Trash2, X, Upload, Loader2 } from "lucide-react";
-import { getProducts, addProduct, supabase } from "@/lib/supabase";
+import { Plus, Search, Filter, Edit2, Trash2, X, Upload, Loader2, Image as ImageIcon } from "lucide-react";
+import { getProducts, supabase } from "@/lib/supabase";
+import { createProduct } from "./actions";
 import { Product } from "@/lib/types";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -11,6 +12,10 @@ export default function AdminProducts() {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Form States
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [newProduct, setNewProduct] = useState<Partial<Product>>({
         name: "",
         description: "",
@@ -18,10 +23,17 @@ export default function AdminProducts() {
         category: "Saree",
         stock: 0,
         is_exclusive: false,
-        images: []
+        images: [],
+        details: {
+            material: "",
+            craft: "",
+            region: "",
+            artisan: "",
+            care: ""
+        }
     });
 
-    const categories = ["Saree", "Suit", "Sleaper", "T-Shirts", "Jewelry"];
+    const categories = ["Saree", "Suit", "Lehenga", "Sherwani", "Jewelry", "Accessories", "Decor"];
 
     useEffect(() => {
         fetchProducts();
@@ -39,10 +51,34 @@ export default function AdminProducts() {
         }
     };
 
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setImageFile(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+
+
     const handleAddProduct = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             setIsSubmitting(true);
+
+            let imageBase64 = "";
+            let imageName = "";
+
+            if (imageFile) {
+                // Convert file to base64
+                const reader = new FileReader();
+                imageBase64 = await new Promise((resolve) => {
+                    reader.onload = (e) => resolve(e.target?.result as string);
+                    reader.readAsDataURL(imageFile);
+                });
+                imageName = imageFile.name;
+            }
+
             const productToSave = {
                 name: newProduct.name!,
                 description: newProduct.description!,
@@ -50,19 +86,34 @@ export default function AdminProducts() {
                 category: newProduct.category!,
                 stock: Number(newProduct.stock),
                 is_exclusive: newProduct.is_exclusive!,
-                images: newProduct.images?.length ? newProduct.images : ["https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=80&w=800"]
+                images: [], // Handled by server
+                details: newProduct.details
             };
 
-            await addProduct(productToSave);
+            const result = await createProduct(productToSave, imageBase64, imageName);
+
+            if (!result.success) {
+                throw new Error(result.error);
+            }
+
             await fetchProducts();
-            setIsModalOpen(false);
-            setNewProduct({ name: "", description: "", price: 0, category: "Saree", stock: 0, is_exclusive: false, images: [] });
-        } catch (error) {
-            alert("Failed to add product.");
-            console.error(error);
+            closeModal();
+        } catch (error: any) {
+            alert(`Error: ${error.message || "Unknown error"}. Check console for details.`);
+            console.error("Full Error:", error);
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setNewProduct({
+            name: "", description: "", price: 0, category: "Saree", stock: 0, is_exclusive: false, images: [],
+            details: { material: "", craft: "", region: "", artisan: "", care: "" }
+        });
+        setImageFile(null);
+        setImagePreview(null);
     };
 
     const handleDelete = async (id: string) => {
@@ -149,17 +200,37 @@ export default function AdminProducts() {
                         <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="modal">
                             <div className="modal-header">
                                 <h2 className="serif">Add Legacy Piece</h2>
-                                <button onClick={() => setIsModalOpen(false)}><X size={24} /></button>
+                                <button onClick={closeModal} className="close-modal-btn"><X size={24} /></button>
                             </div>
                             <form onSubmit={handleAddProduct} className="modal-form">
+                                {/* Image Upload Section */}
+                                <div className="form-group full">
+                                    <label>Product Image</label>
+                                    <div className="image-upload-box">
+                                        <input type="file" id="img-upload" accept="image/*" onChange={handleImageSelect} hidden />
+                                        <label htmlFor="img-upload" className="upload-label">
+                                            {imagePreview ? (
+                                                <img src={imagePreview} className="preview-img" alt="Preview" />
+                                            ) : (
+                                                <div className="placeholder">
+                                                    <Upload size={24} />
+                                                    <span>Click to upload image</span>
+                                                </div>
+                                            )}
+                                        </label>
+                                    </div>
+                                </div>
+
                                 <div className="form-group full">
                                     <label>Product Name</label>
                                     <input required value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} placeholder="e.g. Royal Gold Saree" />
                                 </div>
+
                                 <div className="form-group full">
                                     <label>Description</label>
                                     <textarea required rows={3} value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} placeholder="The story of this piece..." />
                                 </div>
+
                                 <div className="form-group">
                                     <label>Price (INR)</label>
                                     <input required type="number" value={newProduct.price || ''} onChange={e => setNewProduct({ ...newProduct, price: Number(e.target.value) })} />
@@ -168,19 +239,39 @@ export default function AdminProducts() {
                                     <label>Stock</label>
                                     <input required type="number" value={newProduct.stock || ''} onChange={e => setNewProduct({ ...newProduct, stock: Number(e.target.value) })} />
                                 </div>
+
                                 <div className="form-group">
                                     <label>Category</label>
                                     <select value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}>
                                         {categories.map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
-                                <div className="form-group flex-row">
+
+                                {/* Detailed Fields */}
+                                <div className="form-group">
+                                    <label>Material</label>
+                                    <input placeholder="e.g. Pure Silk" value={newProduct.details?.material} onChange={e => setNewProduct({ ...newProduct, details: { ...newProduct.details!, material: e.target.value } })} />
+                                </div>
+                                <div className="form-group">
+                                    <label>Craft</label>
+                                    <input placeholder="e.g. Banarasi Weave" value={newProduct.details?.craft} onChange={e => setNewProduct({ ...newProduct, details: { ...newProduct.details!, craft: e.target.value } })} />
+                                </div>
+                                <div className="form-group">
+                                    <label>Region</label>
+                                    <input placeholder="e.g. Varanasi" value={newProduct.details?.region} onChange={e => setNewProduct({ ...newProduct, details: { ...newProduct.details!, region: e.target.value } })} />
+                                </div>
+                                <div className="form-group">
+                                    <label>Artisan</label>
+                                    <input placeholder="e.g. Weaver Community" value={newProduct.details?.artisan} onChange={e => setNewProduct({ ...newProduct, details: { ...newProduct.details!, artisan: e.target.value } })} />
+                                </div>
+
+                                <div className="form-group flex-row full">
                                     <input type="checkbox" id="excl" checked={newProduct.is_exclusive} onChange={e => setNewProduct({ ...newProduct, is_exclusive: e.target.checked })} />
                                     <label htmlFor="excl" className="no-margin">Exclusive Piece</label>
                                 </div>
 
                                 <div className="modal-footer">
-                                    <button type="button" onClick={() => setIsModalOpen(false)} className="cancel-btn">Cancel</button>
+                                    <button type="button" onClick={closeModal} className="cancel-btn">Cancel</button>
                                     <button type="submit" disabled={isSubmitting} className="btn-primary flex-1">
                                         {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : "Publish Piece"}
                                     </button>
@@ -230,13 +321,15 @@ export default function AdminProducts() {
 
         .loader { padding: 5rem; text-align: center; color: var(--primary); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 2rem; }
-        .modal { background: white; width: 100%; max-width: 600px; border-radius: 32px; overflow: hidden; box-shadow: 0 50px 100px rgba(0,0,0,0.2); }
-        .modal-header { padding: 2rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 1rem; }
+        .modal { background: white; width: 100%; max-width: 600px; border-radius: 20px; overflow: hidden; box-shadow: 0 50px 100px rgba(0,0,0,0.2); max-height: 85vh; display: flex; flex-direction: column; }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .modal-header h2 { font-size: 1.75rem; color: var(--primary); }
-        .modal-header button { background: none; border: none; color: #9ca3af; cursor: pointer; }
+        .close-modal-btn { background: #f3f4f6; border: none; color: #6b7280; cursor: pointer; padding: 0.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; z-index: 10; }
+        .close-modal-btn:hover { background: #fee2e2; color: #ef4444; transform: rotate(90deg); }
         
-        .modal-form { padding: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .modal-form { padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; overflow-y: auto; }
+        
         .form-group.full { grid-column: span 2; }
         .form-group label { display: block; font-size: 11px; text-transform: uppercase; font-weight: 800; color: #9ca3af; margin-bottom: 0.5rem; letter-spacing: 0.05em; }
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.8rem; background: #f9fafb; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.95rem; }
@@ -244,8 +337,18 @@ export default function AdminProducts() {
         .flex-row input { width: 20px; height: 20px; }
         .no-margin { margin-bottom: 0 !important; }
 
-        .modal-footer { grid-column: span 2; display: flex; gap: 1rem; margin-top: 1rem; }
-        .cancel-btn { padding: 1rem 2rem; background: #f3f4f6; border: none; border-radius: 12px; font-weight: bold; color: #6b7280; cursor: pointer; }
+        .image-upload-box { border: 2px dashed #e5e7eb; border-radius: 12px; height: 120px; display: flex; align-items: center; justify-content: center; background: #f9fafb; overflow: hidden; position: relative; }
+        .upload-label { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .placeholder { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: #9ca3af; font-size: 0.8rem; font-weight: 600; }
+        .preview-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .modal-footer { grid-column: span 2; display: flex; gap: 1rem; margin-top: 0.5rem; padding-top: 1rem; border-top: 1px solid #f3f4f6; position: sticky; bottom: 0; background: white; z-index: 10; }
+        
+        @media (max-width: 640px) {
+            .modal-form { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: span 1; }
+            .flex-row { grid-column: span 1; }
+        }
       `}</style>
         </div>
     );

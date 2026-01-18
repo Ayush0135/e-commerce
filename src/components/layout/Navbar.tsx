@@ -29,6 +29,7 @@ export default function Navbar() {
                     <Link href="/shop" className="hover:text-gray-500 transition-colors">Shop</Link>
                     <Link href="/collections" className="hover:text-gray-500 transition-colors">Collections</Link>
                     <Link href="/craftsmanship" className="hover:text-gray-500 transition-colors">Studio</Link>
+                    <Link href="/admin" className="hover:text-[#721818] transition-colors font-bold text-xs border border-[#721818] px-3 py-1 rounded-full">Admin</Link>
                 </div>
 
                 {/* Logo - Center */}
@@ -62,6 +63,7 @@ export default function Navbar() {
                     <Link href="/collections" className="block text-sm uppercase tracking-wide">Collections</Link>
                     <Link href="/craftsmanship" className="block text-sm uppercase tracking-wide">Studio</Link>
                     <Link href="/about" className="block text-sm uppercase tracking-wide">About</Link>
+                    <Link href="/admin" className="block text-sm uppercase tracking-wide text-[#721818]">Admin Panel</Link>
                 </div>
             )}
         </header>

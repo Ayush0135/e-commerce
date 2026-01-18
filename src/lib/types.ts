@@ -8,6 +8,13 @@ export interface Product {
     stock: number;
     is_exclusive: boolean;
     created_at?: string;
+    details?: {
+        material: string;
+        craft: string;
+        region: string;
+        artisan: string;
+        care: string;
+    };
 }
 
 export interface Order {
